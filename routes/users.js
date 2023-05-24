@@ -1,11 +1,15 @@
 import express from "express";
 import UsersModel from "../models/users.js";
 import bcrypt from "bcrypt";
+// middlewares
+import logger from "../middlewares/logger.js";
+import validateUser from "../middlewares/validateUser.js";
+import cacheMiddleware from "../middlewares/cacheMiddleware.js";
 
 const router = express.Router();
 
 // GET
-router.get("/users", async (req, res) => {
+router.get("/users", [cacheMiddleware, logger], async (req, res) => {
   // impaginazioni
   const { page = 1, pageSize = 3 } = req.query;
   try {
@@ -19,6 +23,7 @@ router.get("/users", async (req, res) => {
       count: totalUsers,
       currentPage: +page, // e' la stessa cosa di scrivere Number(page)
       totalPage: Math.ceil(totalUsers / pageSize),
+      users,
     });
   } catch (error) {
     res.status(500).send({
@@ -31,15 +36,15 @@ router.get("/users", async (req, res) => {
 const saltRound = 10;
 const myPlaintextPassword = "";
 
-router.post("/users", async (req, res) => {
+router.post("/users", validateUser, async (req, res) => {
   // gestiamo le hash password
   const genSalt = await bcrypt.genSalt(10); // algoritmo per decriptare password
   const hashPassword = await bcrypt.hash(req.body.password, genSalt);
-  
+
   const user = new UsersModel({
     userName: req.body.userName,
     email: req.body.email,
-    password: req.body.password,
+    password: hashPassword,
   });
   try {
     // facciamo prima una query
@@ -79,7 +84,7 @@ router.patch("/users/:id", async (req, res) => {
       dataUpdated,
       options
     );
-    res.status(200).send({
+    res.status(200).sendStatus({
       message: "user modified",
       payload: result,
     });

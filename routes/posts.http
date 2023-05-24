@@ -1,0 +1,33 @@
+GET http://localhost:5050/posts 
+
+#####
+
+POST http://localhost:5050/posts HTTP/1.1
+content-type: application/json
+
+{
+    "title": "Post numero sei",
+    "img": "https://picscum.photos/1920/1080",
+    "content": "lorem ipsum dhsbdjsbgdjbuidgid sugsdigdywgsbh dbshbksgshb",
+    "author": "God Ilde",
+    "rate": 1
+}
+
+#####
+
+PATCH http://localhost:5050/posts/646cf07c81fdeb9f1d5eadad HTTP/1.1
+content-type: application/json
+
+{
+    "title": "Modificato",
+    "img": "https://picscum.photos/1920/1080",
+    "content": "lorem ipsum dhsbdjsbgdjbuidgid sugsdigdywgsbh dbshbksgshb",
+    "author": "God Ilde",
+    "rate": 1
+}
+
+#####
+DELETE http://localhost:5050/posts/ahdgejd 
+
+
+
